@@ -35,6 +35,7 @@
 #include "printutils.h"
 #include "fileutils.h"
 #include "handle_dep.h" // handle_dep()
+#include "idfdata.h"
 
 #ifdef ENABLE_CGAL
 #include "cgalutils.h"
@@ -106,6 +107,8 @@ AbstractNode *ImportModule::instantiate(const Context *ctx, const ModuleInstanti
 		if (ext == ".stl") actualtype = TYPE_STL;
 		else if (ext == ".off") actualtype = TYPE_OFF;
 		else if (ext == ".dxf") actualtype = TYPE_DXF;
+		else if (ext == ".idf") actualtype = TYPE_IDF; //FFS can we PLEASE pick a extention and stick with it!?
+		else if (ext == ".emn") actualtype = TYPE_IDF;
 	}
 
 	ImportNode *node = new ImportNode(inst, actualtype);
@@ -296,6 +299,11 @@ const Geometry *ImportNode::createGeometry() const
 	case TYPE_DXF: {
 		DxfData dd(this->fn, this->fs, this->fa, this->filename, this->layername, this->origin_x, this->origin_y, this->scale);
 		g = dd.toPolygon2d();
+	}
+		break;
+	case TYPE_IDF: {
+		IdfData idf = IdfData(this->filename);
+		g = idf.toPolygon2d();
 	}
 		break;
 	default:

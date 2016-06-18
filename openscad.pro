@@ -437,6 +437,10 @@ SOURCES += src/version_check.cc \
            src/legacyeditor.cc \
            src/LibraryInfoDialog.cc
 
+# IDFv3 support
+SOURCES += src/idfdata.cc
+HEADERS += src/idfdata.h
+
 # ClipperLib
 SOURCES += src/polyclipping/clipper.cpp
 HEADERS += src/polyclipping/clipper.hpp
