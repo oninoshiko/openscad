@@ -8,11 +8,11 @@
 class IdfData {
 	public:
 		IdfData(const std::string &filename);
-		Polygon2d *toPolygon2d();
+		PolySet *toGeometry();
 
 	private:
-		float conversion; //multiplyer to convert from the file's units to mm
-		float thickness;
+		double conversion; //multiplyer to convert from the file's units to mm
+		double thickness;
 		std::vector<Outline2d> boardOutline;
 
 		//support functions

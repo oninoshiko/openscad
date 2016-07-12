@@ -616,7 +616,7 @@ Response GeometryEvaluator::visit(State &state, const TransformNode &node)
 	return ContinueTraversal;
 }
 
-static void translate_PolySet(PolySet &ps, const Vector3d &translation)
+/*static*/ void translate_PolySet(PolySet &ps, const Vector3d &translation)
 {
 	for(auto &p : ps.polygons) {
 		for(auto &v : p) {
@@ -625,7 +625,7 @@ static void translate_PolySet(PolySet &ps, const Vector3d &translation)
 	}
 }
 
-static void add_slice(PolySet *ps, const Polygon2d &poly, 
+void add_slice(PolySet *ps, const Polygon2d &poly, 
 											double rot1, double rot2, 
 											double h1, double h2, 
 											const Vector2d &scale1,

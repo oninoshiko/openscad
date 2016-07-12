@@ -3,6 +3,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "printutils.h"
+#include "GeometryEvaluator.h"
 #include "idfdata.h"
 
 using namespace std;
@@ -30,15 +31,39 @@ IdfData::IdfData(const std::string &filename){
 	}
 }
 
-Polygon2d *IdfData::toPolygon2d(){
+PolySet *IdfData::toGeometry(){
+	PolySet *ps = new PolySet(3);
+
 	int i = 0;
-	Polygon2d *poly = new Polygon2d();
+	Polygon2d *tmp = new Polygon2d();
 	while(boardOutline.size()>i){
-		poly->addOutline(boardOutline[i]);
+		tmp->addOutline(boardOutline[i]);
 		i++;
 	}
-	return poly;
+	const Polygon2d poly = *tmp;
+	
+	//FIXME: this is essentally a copy of extrudePolygon in GeometryEvalutor.cc It's a prime canidate for refactoring.
+	PolySet *bottem = poly.tessellate(); //bottom
 
+	// Flip vertex ordering for bottom polygon
+        for(auto &p : bottem->polygons) {
+                std::reverse(p.begin(), p.end());
+        }
+        translate_PolySet(*bottem, Vector3d(0.0,0.0,0.0));
+	ps->append(*bottem);
+	delete bottem;
+	
+	PolySet *top = poly.tessellate();
+	translate_PolySet(*top, Vector3d(0.0,0.0,thickness));
+	ps->append(*top);
+	delete top;
+	
+	
+	Vector2d scale1(1,1);
+	Vector2d scale2(1,1);
+	add_slice(ps, poly, 0, 0, 0, thickness, scale1, scale2);
+
+	return ps;
 }
 
 bool IdfData::process_unknown(std::ifstream &stream, std::string type){ 

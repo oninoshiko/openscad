@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "memory.h"
 #include "Geometry.h"
+#include "polyset.h"
 
 #include <utility>
 #include <list>
@@ -75,3 +76,9 @@ private:
 
 public:
 };
+
+//needed for idf importing
+void translate_PolySet(PolySet &ps, const Vector3d &translation);
+void add_slice(PolySet *ps, const Polygon2d &poly, double rot1, double rot2, double h1, 
+				double h2, const Vector2d &scale1, const Vector2d &scale2);
+

@@ -303,7 +303,7 @@ const Geometry *ImportNode::createGeometry() const
 		break;
 	case TYPE_IDF: {
 		IdfData idf = IdfData(this->filename);
-		g = idf.toPolygon2d();
+		g = idf.toGeometry();
 	}
 		break;
 	default:
