@@ -103,6 +103,7 @@ macx {
   APP_RESOURCES.files = OpenSCAD.sdef dsa_pub.pem icons/SCAD.icns
   QMAKE_BUNDLE_DATA += APP_RESOURCES
   LIBS += -framework Cocoa -framework ApplicationServices
+  QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.8
 }
 
 
@@ -297,6 +298,7 @@ HEADERS += src/version_check.h \
            src/projectionnode.h \
            src/cgaladvnode.h \
            src/importnode.h \
+           src/import.h \
            src/transformnode.h \
            src/colornode.h \
            src/rendernode.h \
@@ -432,6 +434,8 @@ SOURCES += src/version_check.cc \
            src/export_nef.cc \
            src/export_png.cc \
            src/import.cc \
+           src/import_stl.cc \
+           src/import_off.cc \
            src/renderer.cc \
            src/colormap.cc \
            src/ThrownTogetherRenderer.cc \
