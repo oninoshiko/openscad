@@ -54,14 +54,14 @@ PolySet *IdfData::toGeometry(){
 	delete bottem;
 	
 	PolySet *top = poly.tessellate();
-	translate_PolySet(*top, Vector3d(0.0,0.0,thickness));
+	translate_PolySet(*top, Vector3d(0.0,0.0,thickness*conversion));
 	ps->append(*top);
 	delete top;
 	
 	
 	Vector2d scale1(1,1);
 	Vector2d scale2(1,1);
-	add_slice(ps, poly, 0, 0, 0, thickness, scale1, scale2);
+	add_slice(ps, poly, 0, 0, 0, thickness*conversion, scale1, scale2);
 
 	return ps;
 }
@@ -139,11 +139,10 @@ bool IdfData::process_board_outline(std::ifstream &stream){
 	//then parse it as 3 if it's not. to_upper is okay here, because record 3 only
 	//has ints and flots
 	unsigned int label;
-	float x, y;
+	double x, y, deg;
 	while(std::getline(stream, line)){
 		boost::trim(line);
 		boost::to_upper(line);
-		PRINTB("DEBUG: %s", line);
 		//parse record 4
 		//.END_BOARD_OUTLINE
 		if (line==".END_BOARD_OUTLINE") return true;
@@ -151,9 +150,10 @@ bool IdfData::process_board_outline(std::ifstream &stream){
 		//parse record 3 (multiple)
 		//Label x y angle
 		label = getint(line);
-		x = getfloat(line);
-		y = getfloat(line);
-		if (getfloat(line) != 0) PRINT("WARNING: arc or circle ignored, treating as line.");
+		x = getfloat(line)*conversion;
+		y = getfloat(line)*conversion;
+		deg = getfloat(line);
+		if (deg != 0) PRINTB("WARNING: arc or circle ignored, treating as line. (%s degrees)", deg);
 
 		if(boardOutline.size() < label+1) boardOutline.push_back(Outline2d());
 		boardOutline[label].vertices.push_back(Vector2d(x,y));
@@ -190,8 +190,8 @@ int IdfData::getint(std::string &line){
 	return r;
 }
 
-float IdfData::getfloat(std::string &line){
-	float r=0.0;
+double IdfData::getfloat(std::string &line){
+	double r=0.0;
 	std::string::size_type i=0;
 
 	boost::trim(line);

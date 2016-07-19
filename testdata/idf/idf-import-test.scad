@@ -1,1 +1,1 @@
-import("testdata/idf/example_board.emn");
+import("example_board.emn");
