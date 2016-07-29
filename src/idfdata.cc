@@ -4,12 +4,15 @@
 
 #include "printutils.h"
 #include "GeometryEvaluator.h"
+#include "calc.h"
 #include "idfdata.h"
 
 using namespace std;
 
-IdfData::IdfData(const std::string &filename){
-
+IdfData::IdfData(double fn, double fs, double fa, const std::string &filename){
+	this->fn=fn;
+	this->fs=fs;
+	this->fa=fa;
 	std::ifstream stream(filename.c_str());
 
 	if (!stream.good()){
@@ -153,10 +156,27 @@ bool IdfData::process_board_outline(std::ifstream &stream){
 		x = getfloat(line)*conversion;
 		y = getfloat(line)*conversion;
 		deg = getfloat(line);
-		if (deg != 0) PRINTB("WARNING: arc or circle ignored, treating as line. (%s degrees)", deg);
+		if(boardOutline.size() < label+1) boardOutline.push_back(Outline2d()); //make sure we have room for the label
 
-		if(boardOutline.size() < label+1) boardOutline.push_back(Outline2d());
-		boardOutline[label].vertices.push_back(Vector2d(x,y));
+		//if deg is zero, it's just a point a poly
+		if (deg == 0) boardOutline[label].vertices.push_back(Vector2d(x,y));
+		//if it's 360, it's the point on a circle around the previous point
+		else if (deg == 360){
+			Vector2d point = Vector2d(x,y);
+			Vector2d center = boardOutline[label].vertices.back();
+			boardOutline[label].vertices.clear();
+			
+			double radius = distance(center, point);
+			// PRINTB("WARNING: circle ignored, treating as line. (%s degrees)", deg);
+			int n = Calc::get_fragments_from_r(radius, fn, fs, fa);
+			for (int i = 0; i < n; i++) {
+				double a = (2*M_PI*i)/n; //FIXME
+				boardOutline[label].vertices.push_back(Vector2d(cos(a)*radius + center[0], sin(a)*radius + center[1]));
+			}
+		}
+		//NFC how arcs work
+		else  PRINTB("WARNING: arc ignored, treating as line. (%s degrees)", deg); 
+
 	}
 	return false;
 }
@@ -203,3 +223,9 @@ double IdfData::getfloat(std::string &line){
 	line.erase(0, i+1);
 	return r;
 }
+
+double IdfData::distance(Vector2d &start, Vector2d &end){
+	// distance forumula useing eigen's vector/array functions
+	return sqrt((end.array()-start.array()).square().sum());
+}
+

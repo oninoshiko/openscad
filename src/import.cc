@@ -156,7 +156,7 @@ const Geometry *ImportNode::createGeometry() const
 		break;
 	}
 	case TYPE_IDF:{
-		IdfData idf = IdfData(this->filename);
+		IdfData idf = IdfData(this->fn, this->fs, this->fa, this->filename);
 		g = idf.toGeometry();
 		break;
 	}
